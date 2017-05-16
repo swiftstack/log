@@ -8,38 +8,40 @@ public struct Log {
         print("[\($0)] \($1)")
     }
 
-    static func handle(event level: Level, message: String) {
+    @_versioned
+    static func handle(event level: Level, message: @autoclosure () -> String) {
         if !disabled {
-            delegate(level, message)
+            delegate(level, message())
         }
     }
 
     // suppress warning
-    static var isDebugBuild: Bool {
+    @_versioned static var isDebugBuild: Bool {
         @inline(__always) get {
             return _isDebugAssertConfiguration()
         }
     }
 
+    @inline(__always)
     public static func debug(_ message: @autoclosure () -> String) {
         if isDebugBuild {
             handle(event: .debug, message: message())
         }
     }
 
-    public static func info(_ message: String) {
+    public static func info(_ message: @autoclosure () -> String) {
         handle(event: .info, message: message)
     }
 
-    public static func warning(_ message: String) {
+    public static func warning(_ message: @autoclosure () -> String) {
         handle(event: .warning, message: message)
     }
 
-    public static func error(_ message: String) {
+    public static func error(_ message: @autoclosure () -> String) {
         handle(event: .error, message: message)
     }
 
-    public static func critical(_ message: String) {
+    public static func critical(_ message: @autoclosure () -> String) {
         handle(event: .critical, message: message)
     }
 }
