@@ -21,9 +21,9 @@ public struct Log {
         }
     }
 
-    public static func debug(_ message: String) {
+    public static func debug(_ message: @autoclosure () -> String) {
         if isDebugBuild {
-            handle(event: .debug, message: message)
+            handle(event: .debug, message: message())
         }
     }
 
