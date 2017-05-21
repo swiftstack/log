@@ -1,6 +1,6 @@
-import XCTest
+import Test
 @testable import Log
 
-class LogTests: XCTestCase {
-
+class LogTests: TestCase {
+    
 }
