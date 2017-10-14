@@ -3,7 +3,7 @@ public struct Log {
         case debug, info, warning, error, critical
     }
 
-    public static var disabled: Bool = false
+    public static var enabled: Bool = true
     public static var level: Level = .debug
 
     public static var delegate: ((String) -> Void) = { message in
@@ -16,7 +16,7 @@ public struct Log {
 
     @_versioned
     static func handle(event level: Level, message: @autoclosure () -> String) {
-        if !disabled && level.isEnabled {
+        if enabled && level.isEnabled {
             delegate(format(level, message()))
         }
     }
