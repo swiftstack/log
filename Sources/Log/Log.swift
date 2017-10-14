@@ -1,9 +1,11 @@
-public enum Level: String {
-    case debug, info, warning, error, critical
-}
-
 public struct Log {
+    public enum Level: Int {
+        case debug, info, warning, error, critical
+    }
+
     public static var disabled: Bool = false
+    public static var level: Level = .debug
+
     public static var delegate: ((String) -> Void) = { message in
         print(message)
     }
@@ -14,7 +16,7 @@ public struct Log {
 
     @_versioned
     static func handle(event level: Level, message: @autoclosure () -> String) {
-        if !disabled {
+        if !disabled && level.isEnabled {
             delegate(format(level, message()))
         }
     }
@@ -47,5 +49,23 @@ public struct Log {
 
     public static func critical(_ message: @autoclosure () -> String) {
         handle(event: .critical, message: message)
+    }
+}
+
+extension Log.Level {
+    var isEnabled: Bool {
+        return Log.level.rawValue <= self.rawValue
+    }
+}
+
+extension Log.Level: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .debug: return "debug"
+        case .info: return "info"
+        case .warning: return "warning"
+        case .error: return "error"
+        case .critical: return "critical"
+        }
     }
 }
