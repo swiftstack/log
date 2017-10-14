@@ -4,14 +4,18 @@ public enum Level: String {
 
 public struct Log {
     public static var disabled: Bool = false
-    public static var delegate: ((Level, String) -> Void) = {
-        print("[\($0)] \($1)")
+    public static var delegate: ((String) -> Void) = { message in
+        print(message)
+    }
+
+    public static var format: ((Level, String) -> String) = { level, message in
+        return "[\(level)] \(message)"
     }
 
     @_versioned
     static func handle(event level: Level, message: @autoclosure () -> String) {
         if !disabled {
-            delegate(level, message())
+            delegate(format(level, message()))
         }
     }
 
