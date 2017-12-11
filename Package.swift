@@ -9,7 +9,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swift-stack/test.git",
-            from: "0.4.0"
+            .branch("master")
         )
     ],
     targets: [
