@@ -8,12 +8,16 @@ let package = Package(
     ],
     dependencies: [
         .package(
+            url: "https://github.com/swift-stack/file.git",
+            .branch("master")
+        ),
+        .package(
             url: "https://github.com/swift-stack/test.git",
             .branch("master")
         )
     ],
     targets: [
-        .target(name: "Log"),
+        .target(name: "Log", dependencies: ["File"]),
         .testTarget(name: "LogTests", dependencies: ["Log", "Test"])
     ]
 )

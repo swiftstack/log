@@ -1,15 +1,18 @@
 import Test
-import Dispatch
-import Foundation
+import File
 @testable import Log
 
 class LogFileTests: TestCase {
+    var temp = Path(string: "/tmp/LogFileTests")
+
     var enabled: Bool! = nil
     var level: Log.Level! = nil
     var format: ((Log.Level, String) -> String)! = nil
     var delegate: ((String) -> Void)! = nil
 
     override func setUp() {
+        try? Directory.create(at: temp)
+
         enabled = Log.enabled
         level = Log.level
         format = Log.format
@@ -17,6 +20,8 @@ class LogFileTests: TestCase {
     }
 
     override func tearDown() {
+        try? Directory.remove(at: temp)
+
         Log.enabled = enabled
         Log.level = level
         Log.format = format
@@ -24,23 +29,22 @@ class LogFileTests: TestCase {
     }
 
     func testLogFile() {
-        let path = "/var/tmp/\(UUID().uuidString)"
-        assertFalse(FileManager.default.fileExists(atPath: path))
+        scope {
+            let file = File(name: #function, at: temp)
+            assertFalse(file.isExists)
 
-        Log.writeToFile(atPath: path)
-        Log.info("message")
+            try Log.write(to: file)
+            Log.info("message")
 
-        assertTrue(FileManager.default.fileExists(atPath: path))
-        guard let data = FileManager.default.contents(atPath: path) else {
-            fail("invalid data")
-            return
+            assertTrue(file.isExists)
         }
-        guard let text = String(data: data, encoding: .utf8) else {
-            fail("invalid string")
-            return
+
+        scope {
+            let file = File(name: #function, at: temp)
+            let stream = try file.open(flags: .read).inputStream
+            let content = try stream.readUntilEnd(as: String.self)
+            assertEqual(content, "[info] message\n")
         }
-        assertEqual(text, "[info] message\n")
-        try? FileManager.default.removeItem(atPath: path)
     }
 
 
