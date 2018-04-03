@@ -14,7 +14,7 @@ public struct Log {
         return "[\(level)] \(message)"
     }
 
-    @_versioned
+    @usableFromInline
     static func handle(event level: Level, message: @autoclosure () -> String) {
         if enabled && level.isEnabled {
             delegate(format(level, message()))
@@ -22,7 +22,8 @@ public struct Log {
     }
 
     // suppress warning
-    @_versioned static var isDebugBuild: Bool {
+    @usableFromInline
+    static var isDebugBuild: Bool {
         @inline(__always) get {
             return _isDebugAssertConfiguration()
         }
