@@ -1,3 +1,7 @@
-public func log(event: Log.Level, message: String) {
-    Log.handle(event: event, message: message)
+public func log(
+    level: Log.Message.Level,
+    source: Log.Message.Source = .init(),
+    message: String)
+{
+    Log.handle(level: level, source: source, message: message)
 }

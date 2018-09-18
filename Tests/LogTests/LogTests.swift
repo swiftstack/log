@@ -2,118 +2,107 @@ import Test
 @testable import Log
 
 class LogTests: TestCase {
-    var enabled: Bool! = nil
-    var level: Log.Level! = nil
-    var format: ((Log.Level, String) -> String)! = nil
-    var delegate: ((String) -> Void)! = nil
+    var isEnabled: Bool! = nil
+    var level: Log.Message.Level! = nil
+    var delegate: LogProtocol! = nil
 
     override func setUp() {
-        enabled = Log.enabled
+        isEnabled = Log.isEnabled
         level = Log.level
-        format = Log.format
         delegate = Log.delegate
     }
 
     override func tearDown() {
-        Log.enabled = enabled
+        Log.isEnabled = isEnabled
         Log.level = level
-        Log.format = format
         Log.delegate = delegate
     }
 
-    func testLog() {
-        var global: String? = nil
+    class TestLog: LogProtocol {
+        var output: String
 
-        Log.delegate = { message in
-            global = message
+        init() {
+            output = ""
         }
 
-        Log.debug("log")
-        assertEqual(global, "[debug] log")
+        func format(_ message: Log.Message) -> String {
+            return "[\(message.level)] \(message.payload)"
+        }
 
-        Log.info("log")
-        assertEqual(global, "[info] log")
-
-        Log.warning("log")
-        assertEqual(global, "[warning] log")
-
-        Log.error("log")
-        assertEqual(global, "[error] log")
-
-        Log.critical("log")
-        assertEqual(global, "[critical] log")
+        func handle(_ message: Log.Message) {
+            output = format(message)
+        }
     }
 
-    func testFormat() {
-        var global: String? = nil
-
-        Log.delegate = { message in
-            global = message
-        }
-
-        Log.format = { level, message in
-            return "level: \(level), message: \(message)"
-        }
+    func testLog() {
+        let log = TestLog()
+        Log.use(log)
 
         Log.debug("log")
-        assertEqual(global, "level: debug, message: log")
+        assertEqual(log.output, "[debug] log")
+
+        Log.info("log")
+        assertEqual(log.output, "[info] log")
+
+        Log.warning("log")
+        assertEqual(log.output, "[warning] log")
+
+        Log.error("log")
+        assertEqual(log.output, "[error] log")
+
+        Log.critical("log")
+        assertEqual(log.output, "[critical] log")
     }
 
     func testEnabled() {
-        var global: String? = nil
+        assertTrue(Log.isEnabled)
+        Log.isEnabled = false
+        assertFalse(Log.isEnabled)
 
-        assertTrue(Log.enabled)
-        Log.enabled = false
-        assertFalse(Log.enabled)
-
-        Log.delegate = { message in
-            global = message
-        }
+        let log = TestLog()
+        Log.use(log)
 
         Log.debug("log")
-        assertEqual(global, nil)
+        assertEqual(log.output, "")
     }
 
     func testLevel() {
-        var global: String? = nil
-
-        Log.delegate = { message in
-            global = message
-        }
+        let log = TestLog()
+        Log.use(log)
 
         Log.debug("log")
-        assertEqual(global, "[debug] log")
-        global = nil
+        assertEqual(log.output, "[debug] log")
+        log.output = ""
 
         Log.level = .info
         Log.debug("log")
-        assertEqual(global, nil)
+        assertEqual(log.output, "")
 
         Log.info("log")
-        assertEqual(global, "[info] log")
-        global = nil
+        assertEqual(log.output, "[info] log")
+        log.output = ""
 
         Log.level = .warning
         Log.debug("log")
-        assertEqual(global, nil)
+        assertEqual(log.output, "")
 
         Log.warning("log")
-        assertEqual(global, "[warning] log")
-        global = nil
+        assertEqual(log.output, "[warning] log")
+        log.output = ""
 
         Log.level = .error
         Log.debug("log")
-        assertEqual(global, nil)
+        assertEqual(log.output, "")
 
         Log.error("log")
-        assertEqual(global, "[error] log")
-        global = nil
+        assertEqual(log.output, "[error] log")
+        log.output = ""
 
         Log.level = .critical
         Log.debug("log")
-        assertEqual(global, nil)
+        assertEqual(log.output, "")
 
         Log.critical("log")
-        assertEqual(global, "[critical] log")
+        assertEqual(log.output, "[critical] log")
     }
 }

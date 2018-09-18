@@ -1,23 +1,39 @@
+public protocol LogProtocol {
+    func handle(_ message: Log.Message)
+}
+
 public struct Log {
-    public enum Level: Int {
-        case debug, info, warning, error, critical
+    public static var isEnabled: Bool = true
+    public static var level: Message.Level = .debug
+
+    static var delegate: LogProtocol = Log.Terminal.shared
+
+    public static func use(_ delegate: LogProtocol) {
+        self.delegate = delegate
     }
 
-    public static var enabled: Bool = true
-    public static var level: Level = .debug
-
-    public static var delegate: ((String) -> Void) = { message in
-        print(message)
-    }
-
-    public static var format: ((Level, String) -> String) = { level, message in
-        return "[\(level)] \(message)"
+    static func isEnabled(for level: Message.Level) -> Bool {
+        return self.level.rawValue <= level.rawValue
     }
 
     @usableFromInline
-    static func handle(event level: Level, message: @autoclosure () -> String) {
-        if enabled && level.isEnabled {
-            delegate(format(level, message()))
+    static func handle(message: Message) {
+        if isEnabled && isEnabled(for: message.level) {
+            delegate.handle(message)
+        }
+    }
+
+    @usableFromInline
+    static func handle(
+        level: Message.Level,
+        source: Message.Source,
+        message: @autoclosure () -> String)
+    {
+        if isEnabled && isEnabled(for: level) {
+            delegate.handle(.init(
+                level: level,
+                source: source,
+                payload: .string(message())))
         }
     }
 
@@ -30,43 +46,40 @@ public struct Log {
     }
 
     @inline(__always)
-    public static func debug(_ message: @autoclosure () -> String) {
+    public static func debug(
+        _ message: @autoclosure () -> String,
+        source: Message.Source = .init())
+    {
         if isDebugBuild {
-            handle(event: .debug, message: message())
+            handle(level: .debug, source: source, message: message)
         }
     }
 
-    public static func info(_ message: @autoclosure () -> String) {
-        handle(event: .info, message: message)
+    public static func info(
+        _ message: @autoclosure () -> String,
+        source: Message.Source = .init())
+    {
+        handle(level: .info, source: source, message: message)
     }
 
-    public static func warning(_ message: @autoclosure () -> String) {
-        handle(event: .warning, message: message)
+    public static func warning(
+        _ message: @autoclosure () -> String,
+        source: Message.Source = .init())
+    {
+        handle(level: .warning, source: source, message: message)
     }
 
-    public static func error(_ message: @autoclosure () -> String) {
-        handle(event: .error, message: message)
+    public static func error(
+        _ message: @autoclosure () -> String,
+        source: Message.Source = .init())
+    {
+        handle(level: .error, source: source, message: message)
     }
 
-    public static func critical(_ message: @autoclosure () -> String) {
-        handle(event: .critical, message: message)
-    }
-}
-
-extension Log.Level {
-    var isEnabled: Bool {
-        return Log.level.rawValue <= self.rawValue
-    }
-}
-
-extension Log.Level: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .debug: return "debug"
-        case .info: return "info"
-        case .warning: return "warning"
-        case .error: return "error"
-        case .critical: return "critical"
-        }
+    public static func critical(
+        _ message: @autoclosure () -> String,
+        source: Message.Source = .init())
+    {
+        handle(level: .critical, source: source, message: message)
     }
 }
