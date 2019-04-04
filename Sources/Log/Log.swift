@@ -27,7 +27,7 @@ public struct Log {
     static func handle(
         level: Message.Level,
         source: Message.Source,
-        message: @autoclosure () -> String)
+        message: () -> String)
     {
         if isEnabled && isEnabled(for: level) {
             delegate.handle(.init(
