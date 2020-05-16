@@ -2,28 +2,8 @@ import Test
 @testable import Log
 
 class LogTests: TestCase {
-    var isEnabled: Bool! = nil
-    var level: Log.Message.Level! = nil
-    var delegate: LogProtocol! = nil
-
-    override func setUp() {
-        isEnabled = Log.isEnabled
-        level = Log.level
-        delegate = Log.delegate
-    }
-
-    override func tearDown() {
-        Log.isEnabled = isEnabled
-        Log.level = level
-        Log.delegate = delegate
-    }
-
     class TestLog: LogProtocol {
-        var output: String
-
-        init() {
-            output = ""
-        }
+        var output: String = ""
 
         func format(_ message: Log.Message) -> String {
             return "[\(message.level)] \(message.payload)"
@@ -34,75 +14,90 @@ class LogTests: TestCase {
         }
     }
 
+    // As it is a global object
+    // use single function to avoid
+    // data races or complex synchronization
+
     func testLog() {
-        let log = TestLog()
-        Log.use(log)
-
-        Log.debug("log")
-        expect(log.output == "[debug] log")
-
-        Log.info("log")
-        expect(log.output == "[info] log")
-
-        Log.warning("log")
-        expect(log.output == "[warning] log")
-
-        Log.error("log")
-        expect(log.output == "[error] log")
-
-        Log.critical("log")
-        expect(log.output == "[critical] log")
+        testBasicFunctions()
+        testLogLevels()
+        testEnabled()
     }
 
-    func testEnabled() {
-        expect(Log.isEnabled)
-        Log.isEnabled = false
-        expect(!Log.isEnabled)
+    private func testBasicFunctions() {
+        let testLog = TestLog()
+        Log.use(testLog)
 
-        let log = TestLog()
-        Log.use(log)
+        Log.debug("message")
+        expect(testLog.output == "[debug] message")
 
-        Log.debug("log")
-        expect(log.output == "")
+        Log.info("message")
+        expect(testLog.output == "[info] message")
+
+        Log.warning("message")
+        expect(testLog.output == "[warning] message")
+
+        Log.error("message")
+        expect(testLog.output == "[error] message")
+
+        Log.critical("message")
+        expect(testLog.output == "[critical] message")
     }
 
-    func testLevel() {
-        let log = TestLog()
-        Log.use(log)
+    private func testLogLevels() {
+        let testLog = TestLog()
+        Log.use(testLog)
 
-        Log.debug("log")
-        expect(log.output == "[debug] log")
-        log.output = ""
+        let currentLevel = Log.level
+
+        Log.level = .debug
+        Log.debug("message")
+        expect(testLog.output == "[debug] message")
+        testLog.output = ""
 
         Log.level = .info
-        Log.debug("log")
-        expect(log.output == "")
+        Log.debug("message")
+        expect(testLog.output.isEmpty)
 
-        Log.info("log")
-        expect(log.output == "[info] log")
-        log.output = ""
+        Log.info("message")
+        expect(testLog.output == "[info] message")
+        testLog.output = ""
 
         Log.level = .warning
-        Log.debug("log")
-        expect(log.output == "")
+        Log.debug("message")
+        expect(testLog.output.isEmpty)
 
-        Log.warning("log")
-        expect(log.output == "[warning] log")
-        log.output = ""
+        Log.warning("message")
+        expect(testLog.output == "[warning] message")
+        testLog.output = ""
 
         Log.level = .error
-        Log.debug("log")
-        expect(log.output == "")
+        Log.debug("message")
+        expect(testLog.output.isEmpty)
 
-        Log.error("log")
-        expect(log.output == "[error] log")
-        log.output = ""
+        Log.error("message")
+        expect(testLog.output == "[error] message")
+        testLog.output = ""
 
         Log.level = .critical
-        Log.debug("log")
-        expect(log.output == "")
+        Log.debug("message")
+        expect(testLog.output.isEmpty)
 
-        Log.critical("log")
-        expect(log.output == "[critical] log")
+        Log.critical("message")
+        expect(testLog.output == "[critical] message")
+
+        Log.level = currentLevel
+    }
+
+    private func testEnabled() {
+        let testLog = TestLog()
+        Log.use(testLog)
+
+        Log.isEnabled = false
+        Log.debug("message")
+        expect(testLog.output.isEmpty)
+
+        Log.isEnabled = true
+        Log.debug("message")
     }
 }
