@@ -39,31 +39,31 @@ class LogTests: TestCase {
         Log.use(log)
 
         Log.debug("log")
-        assertEqual(log.output, "[debug] log")
+        expect(log.output == "[debug] log")
 
         Log.info("log")
-        assertEqual(log.output, "[info] log")
+        expect(log.output == "[info] log")
 
         Log.warning("log")
-        assertEqual(log.output, "[warning] log")
+        expect(log.output == "[warning] log")
 
         Log.error("log")
-        assertEqual(log.output, "[error] log")
+        expect(log.output == "[error] log")
 
         Log.critical("log")
-        assertEqual(log.output, "[critical] log")
+        expect(log.output == "[critical] log")
     }
 
     func testEnabled() {
-        assertTrue(Log.isEnabled)
+        expect(Log.isEnabled)
         Log.isEnabled = false
-        assertFalse(Log.isEnabled)
+        expect(!Log.isEnabled)
 
         let log = TestLog()
         Log.use(log)
 
         Log.debug("log")
-        assertEqual(log.output, "")
+        expect(log.output == "")
     }
 
     func testLevel() {
@@ -71,38 +71,38 @@ class LogTests: TestCase {
         Log.use(log)
 
         Log.debug("log")
-        assertEqual(log.output, "[debug] log")
+        expect(log.output == "[debug] log")
         log.output = ""
 
         Log.level = .info
         Log.debug("log")
-        assertEqual(log.output, "")
+        expect(log.output == "")
 
         Log.info("log")
-        assertEqual(log.output, "[info] log")
+        expect(log.output == "[info] log")
         log.output = ""
 
         Log.level = .warning
         Log.debug("log")
-        assertEqual(log.output, "")
+        expect(log.output == "")
 
         Log.warning("log")
-        assertEqual(log.output, "[warning] log")
+        expect(log.output == "[warning] log")
         log.output = ""
 
         Log.level = .error
         Log.debug("log")
-        assertEqual(log.output, "")
+        expect(log.output == "")
 
         Log.error("log")
-        assertEqual(log.output, "[error] log")
+        expect(log.output == "[error] log")
         log.output = ""
 
         Log.level = .critical
         Log.debug("log")
-        assertEqual(log.output, "")
+        expect(log.output == "")
 
         Log.critical("log")
-        assertEqual(log.output, "[critical] log")
+        expect(log.output == "[critical] log")
     }
 }
