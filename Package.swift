@@ -12,10 +12,18 @@ let package = Package(
         .package(name: "Test")
     ],
     targets: [
-        .target(name: "Log"),
-        .testTarget(
-            name: "LogTests",
-            dependencies: ["Log", "Test"])
+        .target(
+            name: "Log",
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-enable-experimental-concurrency"])
+            ]),
+        .target(
+            name: "Tests/Log",
+            dependencies: ["Log", "Test"],
+            path: "Tests/Log",
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-enable-experimental-concurrency"])
+            ])
     ]
 )
 
