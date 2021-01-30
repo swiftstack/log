@@ -8,7 +8,7 @@ extension Log {
             return "[\(message.level)] \(message.payload)"
         }
 
-        public func handle(_ message: Message) {
+        public func handle(_ message: Message) async {
             print(format(message))
         }
     }

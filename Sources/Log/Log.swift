@@ -1,5 +1,5 @@
 public protocol LogProtocol {
-    func handle(_ message: Log.Message)
+    func handle(_ message: Log.Message) async
 }
 
 public struct Log {
@@ -17,9 +17,9 @@ public struct Log {
     }
 
     @usableFromInline
-    static func handle(message: Message) {
+    static func handle(message: Message) async {
         if isEnabled && isEnabled(for: message.level) {
-            delegate.handle(message)
+            await delegate.handle(message)
         }
     }
 
@@ -27,10 +27,10 @@ public struct Log {
     static func handle(
         level: Message.Level,
         source: Message.Source,
-        message: () -> String)
+        message: () -> String) async
     {
         if isEnabled && isEnabled(for: level) {
-            delegate.handle(.init(
+            await delegate.handle(.init(
                 level: level,
                 source: source,
                 payload: .string(message())))
@@ -48,38 +48,38 @@ public struct Log {
     @inline(__always)
     public static func debug(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init())
+        source: Message.Source = .init()) async
     {
         if isDebugBuild {
-            handle(level: .debug, source: source, message: message)
+            await handle(level: .debug, source: source, message: message)
         }
     }
 
     public static func info(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init())
+        source: Message.Source = .init()) async
     {
-        handle(level: .info, source: source, message: message)
+        await handle(level: .info, source: source, message: message)
     }
 
     public static func warning(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init())
+        source: Message.Source = .init()) async
     {
-        handle(level: .warning, source: source, message: message)
+        await handle(level: .warning, source: source, message: message)
     }
 
     public static func error(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init())
+        source: Message.Source = .init()) async
     {
-        handle(level: .error, source: source, message: message)
+        await handle(level: .error, source: source, message: message)
     }
 
     public static func critical(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init())
+        source: Message.Source = .init()) async
     {
-        handle(level: .critical, source: source, message: message)
+        await handle(level: .critical, source: source, message: message)
     }
 }
