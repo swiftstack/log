@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.4
 import PackageDescription
 
 let package = Package(
@@ -17,7 +17,7 @@ let package = Package(
             swiftSettings: [
                 .unsafeFlags(["-Xfrontend", "-enable-experimental-concurrency"])
             ]),
-        .target(
+        .executableTarget(
             name: "Tests/Log",
             dependencies: ["Log", "Test"],
             path: "Tests/Log",
