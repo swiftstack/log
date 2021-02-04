@@ -4,12 +4,8 @@ import Test
 class TestLog: LogProtocol {
     var output: String = ""
 
-    func format(_ message: Log.Message) -> String {
-        return "[\(message.level)] \(message.payload)"
-    }
-
     func handle(_ message: Log.Message) {
-        output = format(message)
+        output = "[\(message.level)] \(message.payload)"
     }
 }
 

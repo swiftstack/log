@@ -4,12 +4,8 @@ extension Log {
             return Terminal()
         }()
 
-        public var format: ((Message) -> String) = { message in
-            return "[\(message.level)] \(message.payload)"
-        }
-
         public func handle(_ message: Message) async {
-            print(format(message))
+            print("[\(message.level)] \(message.payload)")
         }
     }
 }
