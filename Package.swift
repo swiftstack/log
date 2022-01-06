@@ -6,10 +6,10 @@ let package = Package(
     products: [
         .library(
             name: "Log",
-            targets: ["Log"])
+            targets: ["Log"]),
     ],
     dependencies: [
-        .package(name: "Test")
+        .package(name: "Test"),
     ],
     targets: [
         .target(
