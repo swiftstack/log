@@ -17,16 +17,27 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Log"),
+            name: "Log",
+            swiftSettings: swift6),
         .executableTarget(
             name: "Tests/Log",
             dependencies: [
                 .target(name: "Log"),
                 .product(name: "Test", package: "test"),
             ],
-            path: "Tests/Log"),
+            path: "Tests/Log",
+            swiftSettings: swift6),
     ]
 )
+
+let swift6: [SwiftSetting] = [
+    .enableUpcomingFeature("ConciseMagicFile"),
+    .enableUpcomingFeature("ForwardTrailingClosures"),
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("StrictConcurrency"),
+    .enableUpcomingFeature("ImplicitOpenExistentials"),
+    .enableUpcomingFeature("BareSlashRegexLiterals"),
+]
 
 // MARK: - custom package source
 
