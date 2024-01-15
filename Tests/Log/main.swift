@@ -9,7 +9,7 @@ class TestLog: LogProtocol {
     }
 }
 
-test.case("basic functions") {
+test("basic functions") {
     let testLog = TestLog()
     Log.use(testLog)
 
@@ -29,7 +29,7 @@ test.case("basic functions") {
     expect(testLog.output == "[critical] message")
 }
 
-test.case("log levels") {
+test("log levels") {
     let testLog = TestLog()
     Log.use(testLog)
 
@@ -74,7 +74,7 @@ test.case("log levels") {
     Log.level = currentLevel
 }
 
-test.case(".isEnabled") {
+test(".isEnabled") {
     let testLog = TestLog()
     Log.use(testLog)
 
@@ -86,4 +86,4 @@ test.case(".isEnabled") {
     await Log.debug("message")
 }
 
-test.run()
+await run()
