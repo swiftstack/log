@@ -27,8 +27,8 @@ public struct Log {
     static func handle(
         level: Message.Level,
         source: Message.Source,
-        message: () -> String) async
-    {
+        message: () -> String
+    ) async {
         if isEnabled && isEnabled(for: level) {
             await delegate.handle(.init(
                 level: level,
@@ -48,8 +48,8 @@ public struct Log {
     @inline(__always)
     public static func debug(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init()) async
-    {
+        source: Message.Source = .init()
+    ) async {
         if isDebugBuild {
             await handle(level: .debug, source: source, message: message)
         }
@@ -57,29 +57,29 @@ public struct Log {
 
     public static func info(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init()) async
-    {
+        source: Message.Source = .init()
+    ) async {
         await handle(level: .info, source: source, message: message)
     }
 
     public static func warning(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init()) async
-    {
+        source: Message.Source = .init()
+    ) async {
         await handle(level: .warning, source: source, message: message)
     }
 
     public static func error(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init()) async
-    {
+        source: Message.Source = .init()
+    ) async {
         await handle(level: .error, source: source, message: message)
     }
 
     public static func critical(
         _ message: @autoclosure () -> String,
-        source: Message.Source = .init()) async
-    {
+        source: Message.Source = .init()
+    ) async {
         await handle(level: .critical, source: source, message: message)
     }
 }
